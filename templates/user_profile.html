@@ -1,0 +1,165 @@
+{% extends "layout.html" %}
+{% block body %}
+<!-- Page Header -->
+
+<header class="masthead" style="background-image: url('{{ url_for('static', filename= 'img/home-bg.jpg')}}')">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="site-heading">
+          <h1>Welcome {{current_user.username}}</h1>
+          <span class="subheading">Manage your Blogs and save them</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+    {% with messages =  get_flashed_messages() %}
+    {% if messages[0] == "NOT OK" %}
+    <div id="alert" class="alert alert-danger d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+        <div>
+            &nbsp;Please Upload the Image
+        </div>
+    {% endif %}
+    {% if messages[0] == "OK" %}
+    <div id="alert" class="alert alert-success d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+        <div>
+            &nbsp;Image Uploaded Successfully!
+        </div>
+      </div>
+      {% endif %}
+    {% if messages[0] == "Not Uploaded" %}
+    <div id="alert" class="alert alert-danger d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+        <div>
+            &nbsp;Something went wrong! Upload failed.
+        </div>
+    {% endif %}
+    {% if messages[0] == "Uploaded" %}
+    <div id="alert" class="alert alert-success d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+        <div>
+            &nbsp;Post Uploaded Successfully!
+        </div>
+      </div>
+
+    {% endif %}
+    {% if messages[0] == "Not Edited" %}
+    <div id="alert" class="alert alert-danger d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+        <div>
+            &nbsp;Something went wrong! Updation failed.
+        </div>
+    {% endif %}
+    {% if messages[0] == "Edited" %}
+    <div id="alert" class="alert alert-success d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+        <div>
+            &nbsp;Post Edited Successfully!
+        </div>
+      </div>
+      {% endif %}
+
+    {% if messages[0] == "Not Deleted" %}
+    <div id="alert" class="alert alert-danger d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+        <div>
+            &nbsp;Something went wrong! Deletion failed.
+        </div>
+    {% endif %}
+    {% if messages[0] == "Deleted" %}
+    <div id="alert" class="alert alert-success d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+        <div>
+            &nbsp;Post Deleted Successfully!
+        </div>
+      </div>
+      {% endif %}
+      {%endwith %}
+
+        <script type="text/javascript">
+            setTimeout(function () {
+                $('#alert').alert('close');
+            }, 2500);
+        </script>
+      </div>
+
+<!-- Main Content -->
+<div class="container">
+  <h1 class="text-center"> Actions</h1>
+  <div class="text-center">
+  </div>
+  <div class="text-center">
+    <p>
+ <!-- Button trigger modal -->
+ <a href="/editpost/0"><button class="btn btn-primary">Upload A Post</button></a>&nbsp;&nbsp;
+ <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+    Upload Post Image
+  </button>&nbsp;&nbsp;
+  <a href="/updateprofile"><button class="btn btn-primary">Update Profile</button></a>
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Upload The Image</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <form action="/uploader" method="post" enctype="multipart/form-data">
+              <div class="form-group">
+                <input type="file" name="file" class="form-control-file" id="exampleFormControlFile1">
+              </div>
+              <button type="submit" class="btn btn-primary btn-small">Upload</button>
+            </form>
+          </div>
+      </div>
+    </div>
+  </div>
+     </p>
+  </div>
+<br>
+
+<div class="container">
+    <h2 class="text-center"><u>Your Posts</u> </h2>
+</div>
+<br>
+  <table class="table text-center">
+    <thead>
+      <tr>
+        <th>Serial no</th>
+        <th>Title</th>
+        <th>Date</th>
+        <th>Image filename</th>
+        <th>Edit</th>
+        <th>Delete</th>
+    
+      </tr>
+    </thead>
+    <tbody>
+    {% set count = namespace(value=1) %}
+    {% for post in posts %}
+      <tr>
+        <td>{{count.value}}</td>
+        <td>{{post.title}}</td>
+        <td>{{post.date}}</td>
+        <td>{{post.img}}</td>
+        <td><a href="/editpost/{{post.sno}}"><button class="btn btn-primary">Edit</button></a></td>
+       <td> <a href="/delete/{{post.sno}}"><button type="button" class="btn btn-primary">Delete</button></a></td>
+      </tr>
+      {% set count.value = count.value + 1 %}
+      {% endfor %}
+    </tbody>
+  </table>
+  <hr>
+</div>
+
+
+{% endblock %}
