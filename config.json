@@ -1,0 +1,24 @@
+{
+  "params":
+  {
+    "blog_name": "TheBlogToday",
+    "local_server":"True",
+    "local_uri":  "mysql://root:@localhost/theblogtoday",
+    "prod_uri":  "mysql://root:@localhost/theblogtoday",
+    "fb_url":"https://www.facebook.com/profile.php?id=100011072461162",
+    "twitter_url":"https://twitter.com/hi_kukreja",
+    "github_url" :"https://github.com/himanshkukreja",
+    "tag_line": "A Blog By and For The Programmers",
+    "gmail_username": "help.codingthunder@gmail.com",
+    "recipient_username": "kukreja.him@gmail.com",
+    "gmail_password": "eyleoxuvjbtfibjn",
+    "about_text": "Hi, this is a blogging site created using flask. Author of this site is Himanshu Kukreja",
+    "no_of_posts": 2,
+    "admin_user": "Himanshu kukreja",
+    "admin_password" : "admin123",
+    "isloggedin" : "False",
+    "upload_location" : "C:\\Users\\Himanshu kukreja\\Desktop\\Projects\\TheBlogToday\\static\\img"
+
+  }
+
+}
