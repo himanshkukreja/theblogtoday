@@ -24,6 +24,15 @@
         </div>
       </div>
     {% endif %}
+
+    {% if messages[0] == "account deleted" %}
+    <div id="alert" class="alert alert-success d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+        <div>
+            &nbsp;Your account has been successfully deleted.
+        </div>
+      </div>
+    {% endif %}
     {% endwith %}
   </div>  
   <div class="container">
@@ -47,7 +56,7 @@
           </h3>
 
           <p class="post-meta">Posted by
-            <a href="#">{{post.author}}</a>
+            <a href="/user-profile-view/{{post.author}}">{{post.author}}</a>
             on {{post.date}}</p>
       </div>
       <p>{{post.content[0:100]}}.........</p>
@@ -67,9 +76,10 @@
   </div>
 </div>
 
-{% endblock %}
 <script type="text/javascript">
   setTimeout(function () {
       $('#alert').alert('close');
   }, 2500);
 </script>
+
+{% endblock %}

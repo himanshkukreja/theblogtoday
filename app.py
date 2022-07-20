@@ -1,7 +1,7 @@
 from flask import Flask,render_template, request, session,redirect,flash
 from flask_login import UserMixin, LoginManager, login_user
 from flask_login import login_required, current_user , logout_user
-from datetime import datetime
+from datetime import datetime,date
 from flask_sqlalchemy import SQLAlchemy
 import json
 from flask_mail import Mail
@@ -11,16 +11,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import math
 
 
-local_server=True
+local_server=False
 with open('config.json','r') as c:
   params = json.load(c)["params"]
 
-
-
 app = Flask(__name__)
 app.secret_key = 'secret-key'
-app.config['UPLOAD_FOLDER'] = params['upload_location']
-
+app.config['UPLOAD_FOLDER'] = os.path.abspath("static/img")
+print(os.path.abspath("statiic/img"))
 
 app.config.update(
   MAIL_SERVER = 'smtp.gmail.com',
@@ -35,7 +33,18 @@ mail =Mail(app)
 if(local_server):
   app.config["SQLALCHEMY_DATABASE_URI"] = params['local_uri']
 else:
-    app.config["SQLALCHEMY_DATABASE_URI"] = params['prod_uri']
+
+  PASSWORD=params["PASSWORD"]
+  PUBLIC_IP_ADDRESS=params["PUBLIC_IP_ADDRESS"]
+  DBNAME=params["DBNAME"]
+  PROJECT_ID=params["PROJECT_ID"]
+  INSTANCE_NAME=params["INSTANCE_NAME"]
+
+  app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+mysqldb://root:{PASSWORD}@{PUBLIC_IP_ADDRESS}/{DBNAME}?unix_socket=/cloudsql/{PROJECT_ID}:{INSTANCE_NAME}"
+
+  # mysql+mysqldb://root@/<dbname>?unix_socket=/cloudsql/<projectid>:<instancename>
+  app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]= True
+
 
 db = SQLAlchemy(app)
 
@@ -43,9 +52,9 @@ class Contacts(db.Model):
     sno = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255),  nullable=False)
     email = db.Column(db.String(255),  nullable=False)
-    phone_num = db.Column(db.String(255), nullable=False)
+    phone_num = db.Column(db.Integer, nullable=False)
     message = db.Column(db.String(255),  nullable=False)
-    date = db.Column(db.String, nullable=True)
+    date = db.Column(db.String(255), nullable=True)
 
 class Posts(db.Model):
 
@@ -53,10 +62,10 @@ class Posts(db.Model):
     author= db.Column(db.String(255),  nullable=False)
     title = db.Column(db.String(255),  nullable=False)
     subtitle = db.Column(db.String(255),  nullable=False)
-    slug = db.Column(db.String(25),  nullable=False)
+    slug = db.Column(db.String(255),  nullable=False)
     content = db.Column(db.String(10000), nullable=False)
     img = db.Column(db.String(20), nullable=False)
-    date = db.Column(db.String, nullable=True)
+    date = db.Column(db.String(20), nullable=True)
 
 class Users(UserMixin,db.Model):
     
@@ -66,7 +75,7 @@ class Users(UserMixin,db.Model):
     phone = db.Column(db.Integer,  nullable=False)
     age = db.Column(db.Integer,  nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    dateofsignup = db.Column(db.String, nullable=True)
+    dateofsignup = db.Column(db.String(20), nullable=True)
     def get_id(self):
       return (self.sno)
 
@@ -103,13 +112,13 @@ def home():
     prev="/?page="+str(page-1)
     next ="/?page="+str(page+1)
 
-  return render_template('index.html',prev=prev,next=next,params = params, posts = posts)
+  return render_template('index.html',prev=prev,next=next,params = params, posts = posts, title="TheBlogToday - Home")
 
 
 
 @app.route('/about')
 def about():
-  return render_template('about.html',params = params)
+  return render_template('about.html',params = params, title="TheBlogToday - know the admin")
 
 
 
@@ -121,7 +130,7 @@ def contact():
         phone =request.form.get('phone')
         message =request.form.get('message')
         
-        entry= Contacts(name=name, email=email, phone_num=phone, message=message, date=datetime.now())
+        entry= Contacts(name=name, email=email, phone_num=phone, message=message, date=date.today())
 
         db.session.add(entry)
         db.session.commit()
@@ -140,19 +149,27 @@ def contact():
                             body = reply
                           )
         except:
-          return render_template('contact.html',params = params)
+          return render_template('contact.html',params = params,title="TheBlogToday -Contact Admin")
 
 
-    return render_template('contact.html',params = params)
+    return render_template('contact.html',params = params,title="TheBlogToday -Contact Admin")
 
 
 
 @app.route('/post/<string:post_slug>', methods=['GET'])
 def post_route(post_slug):
   post = Posts.query.filter_by(slug=post_slug).first()
-  return render_template('post.html',params = params, post = post)
+  return render_template('post.html',params = params, post = post,title="TheBlogToday -Post")
 
 
+@app.route('/user-profile-view/<string:username>',methods=['GET'])
+def profile_view(username):
+  posts= Posts.query.filter_by(author=username).all()
+  userdata=Users.query.filter_by(username=username).first()
+  number_of_posts=len(posts)
+  membersince= ((date.today()-userdata.dateofsignup).days)   
+  return render_template('user_profile_view.html',posts=posts,userdata=userdata,number_of_posts=number_of_posts,params = params,membersince=membersince,title="TheBlogToday - users")
+  
 
 @app.route('/editpost/<string:sno>', methods=['GET', 'POST'])
 def editpost(sno):
@@ -171,7 +188,7 @@ def editpost(sno):
       img_file = request.form.get('img_file')
       
       if sno =='0':
-        entry = Posts(title=post_title, slug= slug, content=content, subtitle = tagline, img = img_file, author=author,date=datetime.now())
+        entry = Posts(title=post_title, slug= slug, content=content, subtitle = tagline, img = img_file, author=author,date=date.today())
         try:
           db.session.add(entry)
           db.session.commit()
@@ -188,7 +205,7 @@ def editpost(sno):
         post.subtitle= tagline
         post.slug = slug
         post.img= img_file
-        post.date = datetime.now()
+        post.date = date.today()
         try:
           db.session.commit()
           print()
@@ -199,7 +216,7 @@ def editpost(sno):
           return redirect('/user_profile')
 
     post = Posts.query.filter_by(sno = sno).first()
-    return render_template('edit_post.html', params=params,post=post,sno=sno,username=current_user.username)
+    return render_template('edit_post.html', params=params,post=post,sno=sno,username=current_user.username,title="TheBlogToday - Edit Post")
   return redirect('/')
 
 
@@ -217,11 +234,6 @@ def delelte(sno):
       flash("Not Deleted")
       return redirect('/user_profile')
 
-# @app.route('/updateprofile', methods=['GET', 'POST'])
-# def profileupdate():
-
-
-
 
 @app.route('/uploader', methods=['GET', 'POST'])
 def uploader():
@@ -238,9 +250,6 @@ def uploader():
       return redirect('/user_profile')
 
 
-
-
-
 @app.route('/signup',methods=['GET', 'POST'])
 def signup():
   if (request.method == "POST"):
@@ -250,15 +259,16 @@ def signup():
     phone = request.form.get('phone')
     password = request.form.get('pass')
 
-    umail=Users.query.filter_by(email=email).first()
-    if umail:
-      flash('Email address already exists')
+    dbusername=Users.query.filter_by(username=username).first()
+    if dbusername:
+      flash('Username already exists')
       return redirect('/signup')
+
     new_user = Users(email=email, username=username, age=age, phone=phone, password=generate_password_hash(password, method='sha256'),dateofsignup=datetime.now())
 
     db.session.add(new_user)
     db.session.commit()
-
+    flash("Account Created Successfully")
     return redirect('/signin')
     
   return render_template('signup.html', params = params)
@@ -274,12 +284,14 @@ def signin():
     remember = True if request.form.get('remember') else False
     user=Users.query.filter_by(username=uname).first()
     if not user or not check_password_hash(user.password,password):
-      flash('Username or Password donot match\nPlease check your login details and try again.')
+      flash('notmatch')
       return redirect('/signin')
     
     login_user(user,remember=remember)
     return redirect('/user_profile')
   return render_template('user_login.html', params = params)
+
+
 
 @app.route('/user_profile')
 @login_required
@@ -289,19 +301,64 @@ def profile():
   email=current_user.email
   phone=current_user.phone
   age=current_user.age
-  params["isloggedin"]=True
   posts= Posts.query.filter_by(author=username).all()
-  return render_template('user_profile.html',params = params, username=username, id=id,email=email,posts=posts)
+  return render_template('user_profile.html',params = params,phone=phone,age=age, username=username, id=id,email=email,posts=posts,title="TheBlogToday - User Profile")
+
+
+@app.route('/updateprofile',methods=['POST'])
+@login_required
+def update():
+  uname=current_user.username
+  username = request.form.get('uname')
+  email = request.form.get('email')
+  age = request.form.get('age')
+  phone = request.form.get('phone')
+  password = request.form.get('pass')
+
+  currpass= (Users.query.filter_by(username=uname).first()).password
+  passcheck = check_password_hash(currpass,password)
+  
+  if not passcheck:
+    flash('Password do not match')
+    return redirect('/user_profile')
+
+  user=Users.query.filter_by(username=uname).first()
+  user.email=email
+  user.phone=phone
+  user.age=age
+  try:
+    db.session.commit()
+    flash("Profile Updated Successfully")
+    return redirect('/user_profile')
+  except:
+    flash("Not Edited")
+    return redirect('/user_profile')
+  
+  flash("Username already exists")
+  return redirect('/user_profile')
+
 
 @app.route('/logout_user')
 @login_required
 def user_logout():
-  params["isloggedin"]=False
   logout_user()
   flash("Logout")
   return redirect('/')
 
 
+@app.route('/delete_account')
+@login_required
+def delete_account():
+  deleted_user_name=current_user.username
+  user= Users.query.filter_by(username=deleted_user_name).first()
+  posts= Posts.query.filter_by(author=deleted_user_name).all()
+  db.session.delete(user)
+  db.session.commit()
+  for post in posts:
+    db.session.delete(post)
+    db.session.commit()
+  logout_user()
+  flash("account deleted")
+  return redirect('/')  
 
-
-app.run(port=500, debug=True)
+app.run(debug=True)

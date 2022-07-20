@@ -2,13 +2,19 @@
 {% block body %}
 <!-- Page Header -->
 
+<style type="text/css">
+  A:visited { COLOR: black; TEXT-DECORATION: none; font-weight: normal }
+  A:active { COLOR: white; TEXT-DECORATION: none }
+  A:hover { COLOR: black; TEXT-DECORATION: none; font-weight: none }
+  </style>
+
 <header class="masthead" style="background-image: url('{{ url_for('static', filename= 'img/home-bg.jpg')}}')">
   <div class="overlay"></div>
   <div class="container">
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
         <div class="site-heading">
-          <h1>Welcome {{current_user.username}}</h1>
+          <h1>Welcome <a id ="link" href="/user-profile-view/{{current_user.username}}">{{current_user.username}}</a></h1>
           <span class="subheading">Manage your Blogs and save them</span>
         </div>
       </div>
@@ -18,6 +24,7 @@
 
 <div class="container">
     {% with messages =  get_flashed_messages() %}
+
     {% if messages[0] == "NOT OK" %}
     <div id="alert" class="alert alert-danger d-flex align-items-center" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
@@ -25,6 +32,7 @@
             &nbsp;Please Upload the Image
         </div>
     {% endif %}
+
     {% if messages[0] == "OK" %}
     <div id="alert" class="alert alert-success d-flex align-items-center" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
@@ -32,7 +40,8 @@
             &nbsp;Image Uploaded Successfully!
         </div>
       </div>
-      {% endif %}
+    {% endif %}
+
     {% if messages[0] == "Not Uploaded" %}
     <div id="alert" class="alert alert-danger d-flex align-items-center" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
@@ -40,6 +49,7 @@
             &nbsp;Something went wrong! Upload failed.
         </div>
     {% endif %}
+
     {% if messages[0] == "Uploaded" %}
     <div id="alert" class="alert alert-success d-flex align-items-center" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
@@ -49,6 +59,7 @@
       </div>
 
     {% endif %}
+
     {% if messages[0] == "Not Edited" %}
     <div id="alert" class="alert alert-danger d-flex align-items-center" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
@@ -56,6 +67,7 @@
             &nbsp;Something went wrong! Updation failed.
         </div>
     {% endif %}
+
     {% if messages[0] == "Edited" %}
     <div id="alert" class="alert alert-success d-flex align-items-center" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
@@ -63,7 +75,7 @@
             &nbsp;Post Edited Successfully!
         </div>
       </div>
-      {% endif %}
+    {% endif %}
 
     {% if messages[0] == "Not Deleted" %}
     <div id="alert" class="alert alert-danger d-flex align-items-center" role="alert">
@@ -72,6 +84,7 @@
             &nbsp;Something went wrong! Deletion failed.
         </div>
     {% endif %}
+
     {% if messages[0] == "Deleted" %}
     <div id="alert" class="alert alert-success d-flex align-items-center" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
@@ -79,16 +92,45 @@
             &nbsp;Post Deleted Successfully!
         </div>
       </div>
+    {% endif %}
+
+    {% if messages[0] == "Username already exists" %}
+    <div id="alert" class="alert alert-danger d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+        <div>
+            &nbsp;There is a user with same name or email id. Try again!
+        </div>
+    </div>
       {% endif %}
-      {%endwith %}
+    
 
-        <script type="text/javascript">
-            setTimeout(function () {
-                $('#alert').alert('close');
-            }, 2500);
-        </script>
+   
+    {% if messages[0] == "Password do not match" %}
+    <div id="alert" class="alert alert-danger d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+        <div>
+            &nbsp;Incorrect Password. Try again!s
       </div>
+    </div>
+    {% endif %}
 
+    {% if messages[0] == "Profile Updated Successfully" %}
+    <div id="alert" class="alert alert-success d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+        <div>
+            &nbsp;Profile Updated Successfully
+      </div>
+    </div>
+    {% endif %}
+
+    {%endwith %}
+
+      <script type="text/javascript">
+        setTimeout(function () {
+            $('#alert').alert('close');
+        }, 2500);
+    </script>
+  </div>
 <!-- Main Content -->
 <div class="container">
   <h1 class="text-center"> Actions</h1>
@@ -96,13 +138,93 @@
   </div>
   <div class="text-center">
     <p>
- <!-- Button trigger modal -->
+
  <a href="/editpost/0"><button class="btn btn-primary">Upload A Post</button></a>&nbsp;&nbsp;
+ 
+ <!-- Button trigger modal -->
  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
     Upload Post Image
-  </button>&nbsp;&nbsp;
-  <a href="/updateprofile"><button class="btn btn-primary">Update Profile</button></a>
-  <!-- Modal -->
+  </button >&nbsp;&nbsp;
+
+ <!-- Button trigger modal -->
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Update Profile</button>
+<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="container">
+<div class="container justify-content-center">
+  
+  <form class="form-signin" action="/updateprofile" method="post">
+    <br>
+  <h1 class="h3 mb-3 font-weight-normal">Edit Profile Details </h1><br>
+  
+  <label for="inputuname" class="sr-only">User Name</label>
+  <input disabled type="text" name="uname" id="inputEmail" value="{{username}} (You can't edit your username because it is your unique id)."class="form-control" placeholder="User Name" required autofocus><br>
+
+
+  <label for="inputEmail" class="sr-only">Email address</label>
+  <input type="text" name="email" id="inputEmail"value="{{email}}" class="form-control" placeholder="Email address" required autofocus><br>
+  
+  <label for="age" class="sr-only">age</label>
+  <input type="number" name="age" value="{{age}}" id="age" class="form-control" placeholder="Age" required autofocus><br>
+ 
+  <label for="inputphone" class="sr-only">Phone Number</label>
+  <input type="tel" name="phone" value="{{phone}}" id="inputEmail" class="form-control" placeholder="Contact Number" required autofocus><br>
+  
+  <label for="inputPassword"  class="sr-only"> Password "</label>
+  <input type="password" minlength="8" minlength="8" name = "pass" id="inputPassword" class="form-control" placeholder="Confirm Password" required>
+  
+  <div class="checkbox mb-3">
+  </div>
+
+<br>
+<button class="btn btn-primary " type="submit">Confirm Updation</button>
+<br><br>
+</form>
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal2">
+  Delete this account
+</button>
+<br><br>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Warning!!!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div  class="alert alert-danger d-flex align-items-center" role="alert">
+            Your account will be permanently deleted. Are you sure you want to proceed.
+        </div>
+    </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal"><a href="#"><strong>Cancel</a></button>
+          <button type="button" class="btn btn-secondary"><a href="/delete_account">Yes I am Sure</a></button>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+</div>
+      </div>
+     
+    </div>
+  </div>
+</div>
+  
+
+  <!--Update Modal-->
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -127,7 +249,7 @@
   </div>
 <br>
 
-<div class="container">
+ <div class="container">
     <h2 class="text-center"><u>Your Posts</u> </h2>
 </div>
 <br>
@@ -136,7 +258,7 @@
       <tr>
         <th>Serial no</th>
         <th>Title</th>
-        <th>Date</th>
+        <th>Date of last Edit</th>
         <th>Image filename</th>
         <th>Edit</th>
         <th>Delete</th>
@@ -159,7 +281,5 @@
     </tbody>
   </table>
   <hr>
-</div>
-
-
+</div> 
 {% endblock %}
