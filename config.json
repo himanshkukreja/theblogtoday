@@ -17,11 +17,11 @@
     "admin_password" : "admin123",
     "isloggedin" : "False",
     
-    "PASSWORD" : "Hi@160701",
-    "PUBLIC_IP_ADDRESS": "34.173.142.146",
+    "PASSWORD" : "Himansh9915579903",
+    "PUBLIC_IP_ADDRESS": "35.224.213.158",
     "DBNAME": "theblogtoday",
-    "PROJECT_ID": "theblogtoday",
-    "INSTANCE_NAME":"theblogtoday-db"
+    "PROJECT_ID": "theblogtoday0",
+    "INSTANCE_NAME":"db-theblogtoday"
    
   }
 

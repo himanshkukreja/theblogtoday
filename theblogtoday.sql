@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `contacts`
 --
 
-CREATE TABLE `contacts` (
+CREATE TABLE  `contacts` (
   `sno` int(50) NOT NULL,
   `name` text NOT NULL,
   `email` varchar(255) NOT NULL,
@@ -60,7 +60,7 @@ INSERT INTO `contacts` (`sno`, `name`, `email`, `phone_num`, `message`, `date`) 
 -- Table structure for table `posts`
 --
 
-CREATE TABLE `posts` (
+CREATE TABLE   `posts` (
   `sno` int(50) NOT NULL,
   `author` varchar(255) NOT NULL,
   `title` text NOT NULL,
@@ -68,7 +68,7 @@ CREATE TABLE `posts` (
   `slug` varchar(255) NOT NULL,
   `content` varchar(10000) NOT NULL,
   `img` varchar(20) NOT NULL,
-  `date` date NOT NULL DEFAULT current_timestamp()
+  `date` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -87,7 +87,7 @@ INSERT INTO `posts` (`sno`, `author`, `title`, `subtitle`, `slug`, `content`, `i
 -- Table structure for table `users`
 --
 
-CREATE TABLE `users` (
+CREATE TABLE  `users` (
   `sno` int(50) NOT NULL,
   `username` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
